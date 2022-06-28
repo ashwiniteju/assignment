@@ -1,0 +1,129 @@
+Install JSON Server
+
+npm install -g json-server
+Create a db.json file with some data
+
+{
+  "posts": [
+    { "id": 1, "title": "json-server", "author": "typicode" }
+  ],
+  "comments": [
+    { "id": 1, "body": "some comment", "postId": 1 }
+  ],
+  "profile": { "name": "typicode" }
+}
+Start JSON Server
+
+json-server --watch db.json
+Now if you go to http://localhost:3000/posts/1, you'll get
+
+{ "id": 1, "title": "json-server", "author": "typicode" }
+
+
+$ json-server http://example.com/file.json
+$ json-server http://jsonplaceholder.typicode.com/db
+
+
+// index.js
+module.exports = () => {
+  const data = { users: [] }
+  // Create 1000 users
+  for (let i = 0; i < 1000; i++) {
+    data.users.push({ id: i, name: `user${i}` })
+  }
+  return data
+}
+
+
+
+https://github.com/typicode/json-server
+
+
+$ npm install json-server --save-dev
+// server.js
+const jsonServer = require('json-server')
+const server = jsonServer.create()
+const router = jsonServer.router('db.json')
+const middlewares = jsonServer.defaults()
+
+server.use(middlewares)
+server.use(router)
+server.listen(3000, () => {
+  console.log('JSON Server is running')
+})
+$ node server.js
+ const path = require('path')
+const router = jsonServer.router(path.join(__dirname, 'db.json'))
+
+
+
+const jsonServer = require('json-server')
+const server = jsonServer.create()
+const router = jsonServer.router('db.json')
+const middlewares = jsonServer.defaults()
+
+// Set default middlewares (logger, static, cors and no-cache)
+server.use(middlewares)
+
+// Add custom routes before JSON Server router
+server.get('/echo', (req, res) => {
+  res.jsonp(req.query)
+})
+
+// To handle POST, PUT and PATCH you need to use a body-parser
+// You can use the one used by JSON Server
+server.use(jsonServer.bodyParser)
+server.use((req, res, next) => {
+  if (req.method === 'POST') {
+    req.body.createdAt = Date.now()
+  }
+  // Continue to JSON Server router
+  next()
+})
+
+// Use default router
+server.use(router)
+server.listen(3000, () => {
+  console.log('JSON Server is running')
+})
+
+const jsonServer = require('json-server')
+const server = jsonServer.create()
+const router = jsonServer.router('db.json')
+const middlewares = jsonServer.defaults()
+
+server.use(middlewares)
+server.use((req, res, next) => {
+ if (isAuthorized(req)) { 
+   next() 
+ } else {
+   res.sendStatus(401)
+ }
+})
+server.use(router)
+server.listen(3000, () => {
+  console.log('JSON Server is running')
+})
+
+router.render = (req, res) => {
+  res.jsonp({
+    body: res.locals.data
+  })
+}
+
+
+// simulate a server side error response
+router.render = (req, res) => {
+  res.status(500).jsonp({
+    error: "error message here"
+  })
+}
+
+server.use(jsonServer.rewriter({
+  '/api/*': '/$1',
+  '/blog/:resource/:id/show': '/:resource/:id'
+}))
+
+
+
+
